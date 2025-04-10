@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('potongans', function (Blueprint $table) {
             $table->id();
-            $table->sstring('nama');
+            $table->string('nama');
             $table->integer('jumlah');
             $table->softDeletes();
             $table->timestamps();
