@@ -6,22 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Yayasan extends Model
+class Foundation extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['nama', 'alamat'];
+    protected $fillable = ['name', 'address'];
 
     public function users()
     {
         return $this->hasMany(User::class);
     }
+
     public function units()
     {
         return $this->hasMany(Unit::class);
     }
-    public function pengeluarans()
+
+    public function expenses()
     {
-        return $this->hasMany(Pengeluaran::class);
+        return $this->hasMany(Expense::class);
     }
 }

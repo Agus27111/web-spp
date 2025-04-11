@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tahun_ajarans', function (Blueprint $table) {
+        Schema::create('student_discounts', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->boolean('is_aktif')->default(false);
+            $table->foreignId('student_academic_year_id')->constrained('student_academic_years');
+            $table->foreignId('fee_type_id')->constrained('fee_types');
+            $table->foreignId('discount_id')->constrained('discounts');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tahun_ajarans');
+        Schema::dropIfExists('student_discounts');
     }
 };

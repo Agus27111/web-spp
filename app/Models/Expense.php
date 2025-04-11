@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Pengeluaran extends Model
+class Expense extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['yayasan_id', 'nama', 'jumlah', 'tanggal', 'keterangan'];
+    protected $fillable = ['foundation_id', 'name', 'amount', 'date', 'description'];
 
-    public function yayasan()
+    public function foundation()
     {
-        return $this->belongsTo(Yayasan::class);
+        return $this->belongsTo(Foundation::class);
     }
 }

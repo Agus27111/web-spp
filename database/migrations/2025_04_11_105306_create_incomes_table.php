@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('potongans', function (Blueprint $table) {
+        Schema::create('incomes', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->integer('jumlah');
+            $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('cascade');
+            $table->string('source');
+            $table->decimal('amount', 15, 2);
+            $table->string('description')->nullable();
+            $table->date('date');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('potongans');
+        Schema::dropIfExists('incomes');
     }
 };

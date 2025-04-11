@@ -43,5 +43,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function yayasan() { return $this->belongsTo(Yayasan::class); }
+    public function foundation()
+    {
+        return $this->belongsTo(Foundation::class);
+    }
 }

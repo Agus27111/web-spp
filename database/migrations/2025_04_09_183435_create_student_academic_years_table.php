@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('siswas', function (Blueprint $table) {
+        Schema::create('student_academic_years', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('orangtua_id')->constrained('orang_tuas')->onDelete('cascade');
-            $table->string('nama');
-            $table->string('nisn')->nullable();
-            $table->date('tanggal_lahir')->nullable();
+            $table->foreignId('student_id')->constrained('students');
+            $table->foreignId('academic_year_id')->constrained('academic_years');
+            $table->foreignId('class_id')->constrained('classes');
+            $table->enum('status', ['active', 'graduated', 'left']);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('siswas');
+        Schema::dropIfExists('student_academic_years');
     }
 };

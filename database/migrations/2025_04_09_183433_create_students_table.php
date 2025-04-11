@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('siswa_potongans', function (Blueprint $table) {
+        Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_tahun_id')->constrained()->onDelete('cascade');
-            $table->foreignId('jenis_tarif_id')->constrained()->onDelete('cascade');
-            $table->foreignId('potongan_id')->constrained()->onDelete('cascade');
+            $table->foreignId('guardian_id')->constrained('guardians');
+            $table->string('name');
+            $table->string('nisn')->nullable();
+            $table->date('birth_date');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('siswa_potongans');
+        Schema::dropIfExists('students');
     }
 };

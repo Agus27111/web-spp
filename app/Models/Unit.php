@@ -10,8 +10,15 @@ class Unit extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['yayasan_id', 'nama'];
+    protected $fillable = ['foundation_id', 'name'];
 
-    public function yayasan() { return $this->belongsTo(Yayasan::class); }
-    public function kelas() { return $this->hasMany(Kelas::class); }
+    public function foundation()
+    {
+        return $this->belongsTo(Foundation::class);
+    }
+
+    public function classes()
+    {
+        return $this->hasMany(Classroom::class);
+    }
 }

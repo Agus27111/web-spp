@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('yayasans', function (Blueprint $table) {
+        Schema::create('fee_types', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->text('alamat')->nullable();
+            $table->string('name');
+            $table->string('frequency')->default('monthly');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('yayasans');
+        Schema::dropIfExists('fee_types');
     }
 };

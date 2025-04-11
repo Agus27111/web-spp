@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('siswa_tahuns', function (Blueprint $table) {
+        Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained()->onDelete('cascade');
-            $table->foreignId('tahun_ajaran_id')->constrained()->onDelete('cascade');
-            $table->foreignId('kelas_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['aktif', 'lulus', 'keluar'])->default('aktif');
+            $table->foreignId('foundation_id')->constrained('foundations');
+            $table->string('name');
+            $table->integer('amount');
+            $table->date('date');
+            $table->text('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('siswa_tahuns');
+        Schema::dropIfExists('expenses');
     }
 };

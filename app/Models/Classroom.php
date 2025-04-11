@@ -6,22 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Kelas extends Model
+class Classroom extends Model
+
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['unit_id', 'nama'];
+    protected $fillable = ['unit_id', 'name'];
 
     public function unit()
     {
         return $this->belongsTo(Unit::class);
     }
-    public function siswaTahun()
+    public function studentAcademics()
     {
-        return $this->hasMany(SiswaTahun::class);
+        return $this->hasMany(StudentAcademic::class);
     }
-    public function tarifs()
+    public function fees()
     {
-        return $this->hasMany(Tarif::class);
+        return $this->hasMany(Fee::class);
     }
 }

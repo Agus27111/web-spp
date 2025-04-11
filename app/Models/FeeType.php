@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class JenisTarif extends Model
+class FeeType extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['nama', 'frekuensi'];
+    protected $fillable = ['name', 'frequency'];
 
-    public function tarifs()
+    public function fees()
     {
-        return $this->hasMany(Tarif::class);
+        return $this->hasMany(Fee::class);
     }
-    public function potongans()
+    public function discounts()
     {
-        return $this->hasMany(Potongan::class);
+        return $this->hasMany(Discount::class);
     }
 }

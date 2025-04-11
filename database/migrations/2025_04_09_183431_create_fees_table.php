@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orang_tuas', function (Blueprint $table) {
+        Schema::create('fees', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('nomor_hp')->nullable();
+            $table->foreignId('fee_type_id')->constrained('fee_types');
+            $table->foreignId('academic_year_id')->constrained('academic_years');
+            $table->foreignId('class_id')->constrained('classes');
+            $table->integer('amount');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orang_tuas');
+        Schema::dropIfExists('fees');
     }
 };

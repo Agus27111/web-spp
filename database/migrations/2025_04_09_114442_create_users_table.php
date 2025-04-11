@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('yayasan_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('foundation_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['superadmin','yayasan', 'operator', 'orangtua']);
-            $table->string('nomor_hp')->nullable();
+            $table->enum('role', ['superadmin', 'foundation', 'operator', 'parent']);
+            $table->string('phone_number')->nullable();
             $table->string('image')->nullable();
             $table->softDeletes();
             $table->rememberToken();
