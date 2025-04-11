@@ -11,6 +11,8 @@ class Classroom extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'classes';
+
     protected $fillable = ['unit_id', 'name'];
 
     public function unit()

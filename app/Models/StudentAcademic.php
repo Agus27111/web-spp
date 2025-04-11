@@ -10,6 +10,8 @@ class StudentAcademic extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'student_academic_years';
+
     protected $fillable = ['student_id', 'academic_year_id', 'class_id', 'status'];
 
     public function student()

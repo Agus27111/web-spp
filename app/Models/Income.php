@@ -10,7 +10,7 @@ class Income extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'pemasukans';
+    protected $table = 'incomes';
 
     protected $fillable = [
         'academic_year_id',

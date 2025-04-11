@@ -10,6 +10,8 @@ class Guardian extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'guardians';
+
     protected $fillable = ['name', 'phone_number'];
 
     public function students()
