@@ -16,8 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
 
-
-        User::create([
+        $user = User::create([
             'foundation_id' => null,
             'name' => 'Super Admin',
             'email' => 'super@admin.com',
@@ -25,5 +24,6 @@ class UserSeeder extends Seeder
             'role' => 'superadmin',
             'phone_number' => null,
         ]);
+        $user->assignRole('superadmin');
     }
 }

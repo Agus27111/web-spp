@@ -12,63 +12,54 @@ class RolePermissionSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
+        // Define permissions
         $permissions = [
-            'create fondation',
-            'view all fondations',
-            'manage operators',
-            'manage parents',
-            'manage students',
-            'manage classes',
-            'manage fees',
-            'manage fee types',
-            'manage discounts',
-            'manage payments',
-            'manage incomes',
-            'manage expenses',
-            'view payment history',
-            'view spp report',
-            'print report',
-            'view own bill',
+            'view-dashboard',
+            'manage-academic',
+            'manage-students',
+            'manage-payments',
+            'manage-fee-types',
+            'manage-discounts',
+            'manage-foundations',
+            'manage-users',
+            'manage-expenses',
+            'manage-roles',
+            'manage-permissions',
         ];
 
+        // Create permissions if they do not exist
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
-        // Superadmin
-        $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
+        // Create Superadmin role and assign all permissions
+        $superadmin = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
         $superadmin->givePermissionTo(Permission::all());
 
-        // Fondation
-        $fondation = Role::firstOrCreate(['name' => 'fondation']);
-        $fondation->givePermissionTo([
-            'manage operators',
-            'view payment history',
-            'view spp report',
-            'print report',
+        // Create Foundation role and assign specific permissions
+        $foundation = Role::firstOrCreate(['name' => 'foundation', 'guard_name' => 'web']);
+        $foundation->givePermissionTo([
+            'manage-foundations',
+            'manage-users',
+            'manage-expenses',
         ]);
 
-        // Operator
-        $operator = Role::firstOrCreate(['name' => 'operator']);
+        // Create Operator role and assign specific permissions
+        $operator = Role::firstOrCreate(['name' => 'operator', 'guard_name' => 'web']);
         $operator->givePermissionTo([
-            'manage parents',
-            'manage students',
-            'manage classes',
-            'manage fees',
-            'manage fee types',
-            'manage discounts',
-            'manage payments',
-            'manage incomes',
-            'manage expenses',
-            'view payment history',
-            'view spp report',
-            'print report',
+            'manage-academic',
+            'manage-students',
+            'manage-payments',
+            'manage-fee-types',
+            'manage-discounts',
         ]);
 
-        // Parent
-        $parent = Role::firstOrCreate(['name' => 'parent']);
-        $parent->givePermissionTo(['view own bill']);
+        // Create Parent role and assign specific permission
+        $parent = Role::firstOrCreate(['name' => 'parent', 'guard_name' => 'web']);
+        $parent->givePermissionTo([
+            'view-dashboard',
+        ]);
     }
 }
