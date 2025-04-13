@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->date('date');
             $table->text('description')->nullable();
+            $table->string('payment_proof')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

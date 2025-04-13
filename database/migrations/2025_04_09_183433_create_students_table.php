@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('guardian_id')->constrained('guardians');
             $table->string('name');
             $table->string('nisn')->nullable();
+            $table->string('image')->nullable();
             $table->date('birth_date');
             $table->softDeletes();
             $table->timestamps();

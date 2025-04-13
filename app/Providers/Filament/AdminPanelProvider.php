@@ -17,6 +17,12 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use App\Filament\Admin\Resources\FoundationResource;
+use Filament\Navigation\NavigationBuilder;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages\Dashboard;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -49,8 +55,45 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->plugin(FilamentSpatieRolesPermissionsPlugin::make())
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
+                return $builder->groups([
+                    NavigationGroup::make()
+                        ->items([
+                            NavigationItem::make('dashboard')
+                                ->label(fn(): string => __('filament-panels::pages/dashboard.title'))
+                                ->url(fn(): string => Dashboard::getUrl())
+                                ->isActiveWhen(fn() => request()->routeIs('filament.admin.pages.dashboard')),
+                        ]),
+                    NavigationGroup::make('Role')
+                        ->items([
+                            ...FoundationResource::getNavigationItems(),
+                        ]),
+                    NavigationGroup::make('Setting')
+                        ->items([
+                            NavigationItem::make('Roles')
+                                ->icon('heroicon-o-user-group')
+                                ->url(fn(): string => 'admin/roles')
+                                ->isActiveWhen(fn() => request()->routeIs([
+                                    'filament.admin.resources.roles.index',
+                                    'filament.admin.resources.roles.create',
+                                    'filament.admin.resources.roles.view',
+                                    'filament.admin.resources.roles.edit'
+                                ])),
+                            NavigationItem::make('Permission')
+                                ->icon('heroicon-o-lock-closed')
+                                ->url(fn(): string => 'admin/permission')
+                                ->isActiveWhen(fn() => request()->routeIs([
+                                    'filament.admin.resources.permission.index',
+                                    'filament.admin.resources.permission.create',
+                                    'filament.admin.resources.permission.view',
+                                    'filament.admin.resources.permission.edit'
+                                ])),
+                        ]),
+                ]);
+            });
     }
 }

@@ -10,7 +10,7 @@ class Expense extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['foundation_id', 'name', 'amount', 'date', 'description'];
+    protected $fillable = ['foundation_id', 'name', 'amount', 'date', 'description', 'payment_proof'];
 
     public function foundation()
     {
