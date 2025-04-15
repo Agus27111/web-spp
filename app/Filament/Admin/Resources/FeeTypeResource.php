@@ -17,6 +17,8 @@ class FeeTypeResource extends Resource
 {
     protected static ?string $model = FeeType::class;
 
+    protected static ?string $navigationLabel = 'Tipe Pembayaran';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

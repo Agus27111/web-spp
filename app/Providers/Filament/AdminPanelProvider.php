@@ -23,6 +23,7 @@ use App\Filament\Admin\Resources\DiscountResource;
 use App\Filament\Admin\Resources\ExpenseResource;
 use App\Filament\Admin\Resources\FeeTypeResource;
 use App\Filament\Admin\Resources\FoundationResource;
+use App\Filament\Admin\Resources\IncomeResource;
 use App\Filament\Admin\Resources\PaymentResource;
 use App\Filament\Admin\Resources\StudentResource;
 use App\Filament\Admin\Resources\UserResource;
@@ -94,6 +95,8 @@ class AdminPanelProvider extends PanelProvider
                             ...(Auth::user()?->can('manage-payments') ? PaymentResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-fee-types') ? FeeTypeResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-discounts') ? DiscountResource::getNavigationItems() : []),
+                            ...(Auth::user()?->can('manage-incomes') ? IncomeResource::getNavigationItems() : []),
+                            ...(Auth::user()?->can('manage-expenses') ? ExpenseResource::getNavigationItems() : []),
                         ]),
 
                     // Yayasan
@@ -101,7 +104,6 @@ class AdminPanelProvider extends PanelProvider
                         ->items([
                             ...(Auth::user()?->can('manage-foundations') ? FoundationResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-users') ? UserResource::getNavigationItems() : []),
-                            ...(Auth::user()?->can('manage-expenses') ? ExpenseResource::getNavigationItems() : []),
                         ]),
 
                     // Akses

@@ -19,6 +19,8 @@ class FoundationResource extends Resource
 {
     protected static ?string $model = Foundation::class;
 
+    protected static ?string $navigationLabel = 'Yayasan';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

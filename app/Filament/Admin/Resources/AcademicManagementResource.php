@@ -25,6 +25,8 @@ class AcademicManagementResource extends Resource
             ->withCount(['units', 'classrooms']);
     }
 
+    protected static ?string $navigationLabel = 'Tahun Ajaran';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

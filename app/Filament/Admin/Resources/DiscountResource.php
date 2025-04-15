@@ -17,6 +17,8 @@ class DiscountResource extends Resource
 {
     protected static ?string $model = Discount::class;
 
+    protected static ?string $navigationLabel = 'Potongan';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
