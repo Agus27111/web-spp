@@ -53,7 +53,7 @@ class UserResource extends Resource
                     ->password()
                     ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
                     ->dehydrated(fn(?string $state): bool => filled($state))
-                    ->required(fn(Page $liveware): bool => $liveware instanceof CreateRecord),
+                    ->required(fn($livewire): bool => $livewire instanceof CreateRecord),
 
                 Forms\Components\Select::make('role')
                     ->relationship('roles', 'name')
