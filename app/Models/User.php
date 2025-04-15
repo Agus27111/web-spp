@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -19,7 +20,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['fondation_id', 'name', 'email', 'password', 'phone_number'];
+    protected $fillable = ['foundation_id', 'name', 'email', 'password', 'phone_number'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -47,5 +48,10 @@ class User extends Authenticatable
     public function foundation()
     {
         return $this->belongsTo(Foundation::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 }

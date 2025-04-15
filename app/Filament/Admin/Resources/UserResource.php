@@ -2,16 +2,21 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Althinect\FilamentSpatieRolesPermissions\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Filament\Admin\Resources\UserResource\RelationManagers;
+use App\Models\Foundation;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
@@ -21,31 +26,48 @@ class UserResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $user = auth()->user();
+
+        $foundationField = $user && $user->hasRole('superadmin')
+            ? Forms\Components\Select::make('foundation_id')
+            ->relationship('foundation', 'name')
+            ->label('Foundation')
+            ->required()
+            : Forms\Components\Hidden::make('foundation_id')
+            ->default($user->foundation_id);
+
         return $form
             ->schema([
-                Forms\Components\TextInput::make('foundation_id')
-                    ->numeric(),
+                $foundationField,
+
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('role')
+                    ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
+                    ->dehydrated(fn(?string $state): bool => filled($state))
+                    ->required(fn(Page $liveware): bool => $liveware instanceof CreateRecord),
+
+                Forms\Components\Select::make('role')
+                    ->relationship('roles', 'name')
                     ->required(),
+
                 Forms\Components\TextInput::make('phone_number')
                     ->tel()
                     ->maxLength(255),
+
                 Forms\Components\FileUpload::make('image')
                     ->image(),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {

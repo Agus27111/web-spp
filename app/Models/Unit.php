@@ -21,4 +21,9 @@ class Unit extends Model
     {
         return $this->hasMany(Classroom::class);
     }
+    public function academicYears()
+    {
+        return $this->belongsToMany(AcademicYear::class);
+    }
+
 }

@@ -26,10 +26,21 @@ class FeeTypeResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('frequency')
+                Forms\Components\Select::make('frequency')
                     ->required()
-                    ->maxLength(255)
-                    ->default('monthly'),
+                    ->default('monthly')
+                    ->options([
+                        'monthly' => 'Monthly',
+                        'semester' => 'Semester',
+                        'yearly' => 'Yearly',
+                    ]),
+                Forms\Components\Repeater::make('fees')
+                    ->relationship()
+                    ->schema([
+                        Forms\Components\TextInput::make('jumlah')
+                            ->required()
+                            ->numeric(),
+                    ])
             ]);
     }
 
@@ -40,6 +51,8 @@ class FeeTypeResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('frequency')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('amount')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
