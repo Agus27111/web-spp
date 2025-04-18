@@ -13,7 +13,7 @@ class Classroom extends Model
 
     protected $table = 'classes';
 
-    protected $fillable = ['unit_id', 'name'];
+    protected $fillable = ['unit_id', 'name', 'academic_year_id'];
 
     public function unit()
     {
@@ -26,5 +26,9 @@ class Classroom extends Model
     public function fees()
     {
         return $this->hasMany(Fee::class);
+    }
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 }

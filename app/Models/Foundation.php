@@ -10,11 +10,18 @@ class Foundation extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'address'];
+    protected $fillable = ['name', 'address', 'image'];
 
+    // Relasi Foundation -> User (Admin/Manager)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Relasi Foundation -> Users (Operator, Parent)
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class); // Sebuah foundation memiliki banyak user dengan role operator/parent
     }
 
     public function units()

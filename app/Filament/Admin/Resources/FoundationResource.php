@@ -6,14 +6,16 @@ use App\Filament\Admin\Resources\FoundationResource\Pages;
 use App\Filament\Admin\Resources\FoundationResource\RelationManagers;
 use App\Models\Foundation;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\Hash;
 
 class FoundationResource extends Resource
 {
@@ -32,6 +34,44 @@ class FoundationResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('address')
                     ->columnSpanFull(),
+                Forms\Components\FileUpload::make('image')
+                    ->image()
+                    ->columnSpanFull(),
+                Select::make('user_id')
+                    ->relationship(
+                        name: 'users',
+                        titleAttribute: 'name',
+                    )
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->maxLength(255),
+    
+                    Forms\Components\TextInput::make('email')
+                        ->email()
+                        ->required()
+                        ->maxLength(255),
+    
+                    Forms\Components\TextInput::make('password')
+                        ->password()
+                        ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
+                        ->dehydrated(fn(?string $state): bool => filled($state))
+                        ->required(fn($livewire): bool => $livewire instanceof CreateRecord),
+    
+                    Forms\Components\DatePicker::make('email_verified_at')
+                        ->default(now())
+                        ->label('Email Verified At'),
+    
+                    Forms\Components\Select::make('role')
+                        ->relationship('roles', 'name')
+                        ->required(),
+    
+                    Forms\Components\TextInput::make('phone_number')
+                        ->tel()
+                        ->maxLength(255),
+    
+                    Forms\Components\FileUpload::make('image')
+                    ])
             ]);
     }
 

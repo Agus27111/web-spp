@@ -22,6 +22,7 @@ use App\Filament\Admin\Resources\AcademicManagementResource;
 use App\Filament\Admin\Resources\DiscountResource;
 use App\Filament\Admin\Resources\ExpenseResource;
 use App\Filament\Admin\Resources\FeeTypeResource;
+use App\Filament\Admin\Resources\FoundationRequestResource;
 use App\Filament\Admin\Resources\FoundationResource;
 use App\Filament\Admin\Resources\IncomeResource;
 use App\Filament\Admin\Resources\PaymentResource;
@@ -41,8 +42,15 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
+            ->brandName('Web-Spp')
+
             ->colors([
-                'primary' => Color::Amber,
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
+                'info' => Color::Blue,
+                'primary' => Color::Indigo,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
@@ -102,6 +110,7 @@ class AdminPanelProvider extends PanelProvider
                     // Yayasan
                     NavigationGroup::make('Yayasan')
                         ->items([
+                            ...(Auth::user()?->can('manage-foundations') ? FoundationRequestResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-foundations') ? FoundationResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-users') ? UserResource::getNavigationItems() : []),
                         ]),
@@ -134,4 +143,4 @@ class AdminPanelProvider extends PanelProvider
                 ]);
             });
     }
-}
+}  

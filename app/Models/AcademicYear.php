@@ -27,7 +27,7 @@ class AcademicYear extends Model
     {
         return $this->hasMany(Income::class);
     }
-        public function units()
+    public function units()
     {
         return $this->belongsToMany(Unit::class);
     }

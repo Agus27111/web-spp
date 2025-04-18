@@ -55,6 +55,10 @@ class UserResource extends Resource
                     ->dehydrated(fn(?string $state): bool => filled($state))
                     ->required(fn($livewire): bool => $livewire instanceof CreateRecord),
 
+                Forms\Components\DatePicker::make('email_verified_at')
+                    ->default(now())
+                    ->label('Email Verified At'),
+
                 Forms\Components\Select::make('role')
                     ->relationship('roles', 'name')
                     ->required(),
@@ -65,6 +69,8 @@ class UserResource extends Resource
 
                 Forms\Components\FileUpload::make('image')
                     ->image(),
+
+
             ]);
     }
 

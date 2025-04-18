@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
             'email' => 'super@admin.com',
             'password' => Hash::make('coba123'),
             'role' => 'superadmin',
+            'email_verified_at' => now(),
             'phone_number' => null,
         ]);
         $user->assignRole('superadmin');
