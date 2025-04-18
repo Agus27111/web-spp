@@ -10,7 +10,7 @@ class Student extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['parent_id', 'name', 'nisn', 'image', 'birth_date'];
+    protected $fillable = ['guardian_id', 'name', 'nisn', 'image', 'birth_date'];
 
     public function guardian()
     {
