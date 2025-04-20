@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use App\Mail\FoundationPendingMail;
+use Illuminate\Support\Facades\Mail;
 
 class RegisteredUserController extends Controller
 {
@@ -36,15 +39,27 @@ class RegisteredUserController extends Controller
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
-    
-        FoundationRequest::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-            'status' => 'pending',
-        ]);
-    
-        return redirect()->route('login')->with('status', 'Pendaftaran berhasil. Silakan tunggu persetujuan dari Superadmin.');
+
+        DB::beginTransaction();
+
+        try {
+            $foundation = FoundationRequest::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'address' => $request->address,
+                'status' => 'pending',
+            ]);
+
+            Mail::to($request->email)->queue(new FoundationPendingMail($foundation));
+
+            DB::commit(); // Simpan ke database jika tidak ada error
+
+            return redirect('/login')->with('status', 'Pendaftaran berhasil. Silakan cek email untuk info selanjutnya.');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan jika ada error
+
+            return back()->withErrors(['error' => 'Terjadi kesalahan. Silakan coba lagi.']);
+        }
     }
 }

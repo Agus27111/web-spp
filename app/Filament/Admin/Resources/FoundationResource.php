@@ -34,6 +34,9 @@ class FoundationResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('address')
                     ->columnSpanFull(),
+                Forms\Components\TextInput::make('phone_number')
+                    ->tel()
+                    ->maxLength(255),
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->columnSpanFull(),
@@ -44,33 +47,33 @@ class FoundationResource extends Resource
                     )
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
-                        ->required()
-                        ->maxLength(255),
-    
-                    Forms\Components\TextInput::make('email')
-                        ->email()
-                        ->required()
-                        ->maxLength(255),
-    
-                    Forms\Components\TextInput::make('password')
-                        ->password()
-                        ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
-                        ->dehydrated(fn(?string $state): bool => filled($state))
-                        ->required(fn($livewire): bool => $livewire instanceof CreateRecord),
-    
-                    Forms\Components\DatePicker::make('email_verified_at')
-                        ->default(now())
-                        ->label('Email Verified At'),
-    
-                    Forms\Components\Select::make('role')
-                        ->relationship('roles', 'name')
-                        ->required(),
-    
-                    Forms\Components\TextInput::make('phone_number')
-                        ->tel()
-                        ->maxLength(255),
-    
-                    Forms\Components\FileUpload::make('image')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('password')
+                            ->password()
+                            ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
+                            ->dehydrated(fn(?string $state): bool => filled($state))
+                            ->required(fn($livewire): bool => $livewire instanceof CreateRecord),
+
+                        Forms\Components\DatePicker::make('email_verified_at')
+                            ->default(now())
+                            ->label('Email Verified At'),
+
+                        Forms\Components\Select::make('role')
+                            ->relationship('roles', 'name')
+                            ->required(),
+
+                        Forms\Components\TextInput::make('phone_number')
+                            ->tel()
+                            ->maxLength(255),
+
+                        Forms\Components\FileUpload::make('image')
                     ])
             ]);
     }
@@ -83,6 +86,8 @@ class FoundationResource extends Resource
                     ->numeric()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('phone_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()

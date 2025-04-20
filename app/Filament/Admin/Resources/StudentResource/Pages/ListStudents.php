@@ -44,9 +44,9 @@ class ListStudents extends ListRecords
         Excel::import(new StudentsImport, $this->file->getRealPath());
 
         Notification::make()
-            ->title('Import Berhasil')
-            ->success()
+            ->title('Saved successfully')
             ->body('Data siswa telah berhasil diimpor dari file.')
+            ->success()
             ->send();
 
         $this->file = null;

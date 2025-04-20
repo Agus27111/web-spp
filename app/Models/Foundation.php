@@ -10,7 +10,7 @@ class Foundation extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'address', 'image'];
+    protected $fillable = ['name', 'address', 'image', 'phone_number'];
 
     // Relasi Foundation -> User (Admin/Manager)
     public function user()
