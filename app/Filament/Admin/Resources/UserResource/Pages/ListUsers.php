@@ -16,4 +16,14 @@ class ListUsers extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    public static function getHead(): string
+    {
+        return '
+        <style>
+           .filter-hidden {
+    display: none !important;
+}
+        </style>';
+    }
 }
