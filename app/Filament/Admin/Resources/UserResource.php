@@ -6,6 +6,7 @@ use Althinect\FilamentSpatieRolesPermissions\Resources\RoleResource\Pages\Create
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Filament\Admin\Resources\UserResource\RelationManagers;
 use App\Models\Foundation;
+use App\Models\Role;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -28,7 +29,7 @@ class UserResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $foundationField = $user && $user->hasRole('superadmin')
             ? Forms\Components\Select::make('foundation_id')
@@ -59,10 +60,26 @@ class UserResource extends Resource
 
                 Forms\Components\DatePicker::make('email_verified_at')
                     ->default(now())
+                    ->dehydrated(fn(?string $state): bool => filled($state))
+                    ->required(fn($livewire): bool => $livewire instanceof CreateRecord)
+                    ->visible(fn($livewire) => $livewire instanceof CreateRecord)
                     ->label('Email Verified At'),
 
                 Forms\Components\Select::make('role')
                     ->relationship('roles', 'name')
+                    ->options(function () use ($user) {
+                        if ($user && $user->hasRole('foundation')) {
+                            return Role::whereIn('name', ['operator', 'parent'])->pluck('name', 'id');
+                        }
+
+                        if ($user && $user->hasRole('superadmin')) {
+                            return Role::all()->pluck('name', 'id');
+                        }
+                        return [];
+                    })
+                    ->dehydrated(fn(?string $state): bool => filled($state))
+                    ->required(fn($livewire): bool => $livewire instanceof CreateRecord)
+                    ->visible(fn($livewire) => $livewire instanceof CreateRecord)
                     ->required(),
 
                 Forms\Components\TextInput::make('phone_number')
@@ -95,9 +112,6 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('role'),
                 Tables\Columns\TextColumn::make('phone_number')
                     ->searchable(),

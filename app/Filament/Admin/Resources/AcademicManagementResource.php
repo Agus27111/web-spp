@@ -3,9 +3,8 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AcademicManagementResource\Pages;
-use App\Filament\Admin\Resources\AcademicManagementResource\RelationManagers;
-use App\Models\AcademicManagement;
 use App\Models\AcademicYear;
+use App\Models\Foundation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,6 +12,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Illuminate\Support\Facades\Auth;
 
 class AcademicManagementResource extends Resource
 {
@@ -40,8 +44,12 @@ class AcademicManagementResource extends Resource
                                 Forms\Components\TextInput::make('name')
                                     ->required()
                                     ->maxLength(255),
-                                Forms\Components\Toggle::make('is_activ')
-                                    ->label('Aktif?')
+                                Forms\Components\Select::make('is_active')
+                                    ->label('Status')
+                                    ->options([
+                                        true => '✅ Aktif',
+                                        false => '❌ Tidak Aktif',
+                                    ])
                                     ->required(),
                             ]),
 
@@ -61,8 +69,13 @@ class AcademicManagementResource extends Resource
                                                 'universitas' => 'Universitas',
                                             ])
                                             ->required(),
+                                        Forms\Components\Select::make('foundation_id')
+                                            ->label('Foundation')
+                                            ->options(Foundation::all()->pluck('name', 'id'))
+                                            ->required()
+                                            ->visible(fn() => Auth::user()->role === 'superadmin'),
                                     ])
-                                    ->columns(2),
+
                             ]),
 
                         Forms\Components\Tabs\Tab::make('Kelas')
@@ -76,12 +89,20 @@ class AcademicManagementResource extends Resource
 
                                         Forms\Components\Select::make('unit_id')
                                             ->label('Unit')
-                                            ->relationship('unit', 'name')
+                                            ->options(function (callable $get) {
+                                                $rootUnits = $get('../../units') ?? [];
+
+                                                return collect($rootUnits)
+                                                    ->filter(fn($unit) => isset($unit['name']) && is_string($unit['name']))
+                                                    ->pluck('name', 'name');
+                                            })
                                             ->required(),
                                     ])
-                                    ->columns(2),
+
                             ]),
                     ])
+                    ->columnSpanFull()
+                    ->contained(),
             ]);
     }
 
@@ -95,7 +116,11 @@ class AcademicManagementResource extends Resource
 
                 Tables\Columns\IconColumn::make('is_activ')
                     ->boolean()
-                    ->label('Aktif'),
+                    ->label('Aktif')
+                    ->trueIcon('heroicon-m-check-circle')
+                    ->falseIcon('heroicon-m-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
 
                 Tables\Columns\TextColumn::make('units_count')
                     ->counts('units')
@@ -104,10 +129,13 @@ class AcademicManagementResource extends Resource
                 Tables\Columns\TextColumn::make('classrooms_count')
                     ->counts('classrooms')
                     ->label('Jumlah Kelas'),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->label('Dibuat'),
+            ])
+            ->actions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ]);
     }
 

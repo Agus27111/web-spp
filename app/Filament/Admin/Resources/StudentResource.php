@@ -6,11 +6,15 @@ use App\Filament\Admin\Resources\StudentResource\Pages;
 use App\Filament\Admin\Resources\StudentResource\RelationManagers;
 use App\Models\Student;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StudentResource extends Resource
@@ -25,32 +29,97 @@ class StudentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('guardian_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nisn')
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
-                Forms\Components\DatePicker::make('birth_date')
-                    ->required(),
+                Forms\Components\Tabs::make('Tabs')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('Orang Tua')
+                            ->schema([
+                                Select::make('guardian_id')
+                                    ->label('Pilih / Tambah Orang Tua')
+                                    ->relationship('guardian', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->label('Nama Orang Tua')
+                                            ->required(),
+
+                                        TextInput::make('phone_number')
+                                            ->label('Nomor HP')
+                                            ->tel()
+                                            ->maxLength(255),
+                                    ])
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make('Siswa')
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nama Siswa')
+                                    ->required()
+                                    ->maxLength(255),
+
+                                Forms\Components\TextInput::make('nisn')
+                                    ->label('NISN')
+                                    ->maxLength(255),
+
+                                Forms\Components\FileUpload::make('image')
+                                    ->label('Foto')
+                                    ->image(),
+
+                                Forms\Components\DatePicker::make('birth_date')
+                                    ->label('Tanggal Lahir')
+                                    ->required(),
+                                    Forms\Components\Repeater::make('studentAcademics')
+                                    ->relationship('studentAcademics')
+                                    ->label('Tahun Akademik')
+                                    ->schema([
+                                        Forms\Components\Select::make('academic_year_id')
+                                            ->label('Tahun Ajaran')
+                                            ->relationship('academicYear', 'name')
+                                            ->required(),
+
+                                        Forms\Components\Select::make('class_id')
+                                            ->label('Kelas')
+                                            ->relationship('classroom', 'name')
+                                            ->required(),
+
+                                        Forms\Components\Select::make('status')
+                                            ->label('Status')
+                                            ->options([
+                                                'active' => 'Aktif',
+                                                'inactive' => 'Tidak Aktif',
+                                            ])
+                                            ->required(),
+                                    ])
+                                    ->defaultItems(1)
+                                    ->columns(3)
+                                    ->columnSpanFull()
+
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->columnSpanFull()
             ]);
     }
+
+
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('guardian_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('studentAcademics.academicYear.name')
+                    ->label('Tahun Akademik'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nisn')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('studentAcademics.class.name')
+                    ->label('Kelas'),
+                Tables\Columns\TextColumn::make('guardian.name')
+                    ->label('Nama Orang Tua')
+                    ->sortable(),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('birth_date')
                     ->date()

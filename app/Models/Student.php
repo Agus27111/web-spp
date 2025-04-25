@@ -24,4 +24,5 @@ class Student extends Model
     {
         return $this->hasMany(StudentDiscount::class);
     }
+    
 }

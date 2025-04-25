@@ -14,6 +14,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Mail\FoundationPendingMail;
+use App\Mail\NewFoundationRequestMail;
 use Illuminate\Support\Facades\Mail;
 
 class RegisteredUserController extends Controller
@@ -52,8 +53,9 @@ class RegisteredUserController extends Controller
             ]);
 
             Mail::to($request->email)->queue(new FoundationPendingMail($foundation));
+            Mail::to(env('ADMIN_EMAIL'))->queue(new NewFoundationRequestMail($foundation));
 
-            DB::commit(); // Simpan ke database jika tidak ada error
+            DB::commit();
 
             return redirect('/login')->with('status', 'Pendaftaran berhasil. Silakan cek email untuk info selanjutnya.');
         } catch (\Exception $e) {

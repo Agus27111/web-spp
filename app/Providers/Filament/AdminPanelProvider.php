@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('Web-Spp')
-
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
@@ -143,4 +143,4 @@ class AdminPanelProvider extends PanelProvider
                 ]);
             });
     }
-}  
+}
