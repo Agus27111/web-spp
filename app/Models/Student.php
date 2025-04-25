@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToFoundation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToFoundation;
 
-    protected $fillable = ['guardian_id', 'name', 'nisn', 'image', 'birth_date'];
+    protected $fillable = ['foundation_id', 'guardian_id', 'name', 'nisn', 'image', 'birth_date'];
 
     public function guardian()
     {

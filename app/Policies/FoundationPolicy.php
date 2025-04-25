@@ -13,7 +13,7 @@ class FoundationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('manage-foundations');
+        return $user->hasRole('superadmin') || $user->hasRole('foundation');
     }
 
     /**
@@ -21,7 +21,11 @@ class FoundationPolicy
      */
     public function view(User $user, Foundation $foundation): bool
     {
-        return $user->can('manage-foundations');
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return $user->hasRole('foundation') && $user->foundation_id === $foundation->id;
     }
 
     /**
@@ -29,7 +33,7 @@ class FoundationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('manage-foundations');
+        return $user->hasRole('superadmin');
     }
 
     /**
@@ -37,7 +41,11 @@ class FoundationPolicy
      */
     public function update(User $user, Foundation $foundation): bool
     {
-        return $user->can('manage-foundations');
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return $user->hasRole('foundation') && $user->foundation_id === $foundation->id;
     }
 
     /**
@@ -45,7 +53,7 @@ class FoundationPolicy
      */
     public function delete(User $user, Foundation $foundation): bool
     {
-        return $user->can('manage-foundations');
+        return $user->hasRole('superadmin');
     }
 
     /**
@@ -53,7 +61,7 @@ class FoundationPolicy
      */
     public function restore(User $user, Foundation $foundation): bool
     {
-        return $user->can('manage-foundations');
+        return $user->hasRole('superadmin');
     }
 
     /**
@@ -61,6 +69,6 @@ class FoundationPolicy
      */
     public function forceDelete(User $user, Foundation $foundation): bool
     {
-        return $user->can('manage-foundations');
+        return $user->hasRole('superadmin');
     }
 }

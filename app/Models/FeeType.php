@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToFoundation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FeeType extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToFoundation;
 
-    protected $fillable = ['name', 'frequency'];
+    protected $fillable = ['foundation_id', 'name', 'frequency'];
 
     public function fees()
     {
@@ -19,5 +20,9 @@ class FeeType extends Model
     public function discounts()
     {
         return $this->hasMany(Discount::class);
+    }
+    public function foundation()
+    {
+        return $this->belongsTo(Foundation::class);
     }
 }

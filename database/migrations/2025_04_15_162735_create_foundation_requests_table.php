@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('foundation_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); 
-            $table->string('email')->unique(); 
-            $table->string('phone_number')->nullable(); 
-            $table->string('address')->nullable(); 
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone_number')->nullable();
+            $table->string('address')->nullable();
             $table->string('status')->default('pending'); // pending / approved / rejected
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();

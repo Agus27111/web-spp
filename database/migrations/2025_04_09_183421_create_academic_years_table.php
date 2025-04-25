@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('academic_years', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('foundation_id')->constrained()->onDelete('cascade');
             $table->string('name')->unique();
             $table->boolean('is_active')->default(false);
             $table->softDeletes();

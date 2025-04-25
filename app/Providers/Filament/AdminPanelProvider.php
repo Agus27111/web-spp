@@ -110,7 +110,7 @@ class AdminPanelProvider extends PanelProvider
                     // Yayasan
                     NavigationGroup::make('Yayasan')
                         ->items([
-                            ...(Auth::user()?->can('manage-foundations') ? FoundationRequestResource::getNavigationItems() : []),
+                            ...(Auth::user()?->hasRole('superadmin') ? FoundationRequestResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-foundations') ? FoundationResource::getNavigationItems() : []),
                             ...(Auth::user()?->can('manage-users') ? UserResource::getNavigationItems() : []),
                         ]),

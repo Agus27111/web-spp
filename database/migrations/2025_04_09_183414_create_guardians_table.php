@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('guardians', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('foundation_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('phone_number');
             $table->softDeletes();

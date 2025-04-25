@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToFoundation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToFoundation;
 
     protected $fillable = [
+        'foundation_id',
         'student_year_id',
         'fee_id',
         'month',
@@ -30,4 +32,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Fee::class);
     }
+    public function foundation()
+{
+    return $this->belongsTo(Foundation::class);
+}
+
 }

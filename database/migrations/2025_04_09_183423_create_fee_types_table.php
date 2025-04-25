@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('fee_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('foundation_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('frequency')->default('monthly');
             $table->softDeletes();

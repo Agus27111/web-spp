@@ -121,12 +121,16 @@ class FoundationRequestResource extends Resource
                             $user->assignRole('foundation');
 
                             // Buat Foundation
-                            Foundation::create([
+                            $foundation = Foundation::create([
                                 'name' => $record->name,
                                 'address' => $record->address,
                                 'image' => $record->image ?? null,
                                 'user_id' => $user->id,
                                 'phone_number' => $record->phone_number,
+                            ]);
+
+                            $user->update([
+                                'foundation_id' => $foundation->id,
                             ]);
 
                             if (!$record->email) {

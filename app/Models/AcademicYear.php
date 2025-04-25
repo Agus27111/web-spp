@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToFoundation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AcademicYear extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToFoundation;
 
     protected $table = 'academic_years';
 
-    protected $fillable = ['name', 'is_active'];
+    protected $fillable = ['name', 'is_active', 'foundation_id'];
 
     public function studentAcademics()
     {
@@ -34,5 +35,9 @@ class AcademicYear extends Model
     public function classrooms()
     {
         return $this->hasMany(Classroom::class);
+    }
+    public function foundation()
+    {
+        return $this->belongsTo(Foundation::class);
     }
 }

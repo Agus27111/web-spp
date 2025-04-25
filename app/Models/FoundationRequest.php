@@ -10,6 +10,7 @@ class FoundationRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'email', 'phone_number', 'address', 'status', 'email_verified_at'
+         'name', 'email', 'phone_number', 'address', 'status', 'email_verified_at'
     ];
+
 }
