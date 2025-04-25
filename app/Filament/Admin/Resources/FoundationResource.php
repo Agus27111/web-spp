@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class FoundationResource extends Resource
 {
@@ -24,6 +25,20 @@ class FoundationResource extends Resource
     protected static ?string $navigationLabel = 'Yayasan';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+
+    //mengatur hanya superadmin bisaliat semua, foundation hanya dirinya
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (Auth::user()->hasRole('superadmin')) {
+            return $query; // Superadmin bisa lihat semua
+        }
+
+        // Selain superadmin, hanya bisa lihat foundation miliknya
+        return $query->where('id', Auth::user()->foundation_id);
+    }
 
     public static function form(Form $form): Form
     {
@@ -75,6 +90,8 @@ class FoundationResource extends Resource
 
                         Forms\Components\FileUpload::make('image')
                     ])
+                    ->visible(fn($livewire) => $livewire instanceof \Filament\Resources\Pages\CreateRecord)
+                // ->disabled(fn($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord)
             ]);
     }
 

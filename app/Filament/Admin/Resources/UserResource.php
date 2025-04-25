@@ -27,6 +27,18 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (Auth::user()->hasRole('superadmin')) {
+            return $query; // Superadmin bisa lihat semua
+        }
+
+        // Selain superadmin, hanya bisa lihat foundation miliknya
+        return $query->where('foundation_id', Auth::user()->foundation_id);
+    }
+
     public static function form(Form $form): Form
     {
         $user = Auth::user();
@@ -96,14 +108,8 @@ class UserResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $authUser = Auth::user();
-        $query = User::query();
-        if (!$authUser->hasRole('superadmin')) {
-            $query->where('role', '!=', 'superadmin');
-        }
 
         return $table
-            ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('foundation_id')
                     ->numeric()
@@ -128,15 +134,6 @@ class UserResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('foundation_id')
-                    ->options(function () use ($authUser) {
-                        return $authUser->hasRole('foundation')
-                            ? [$authUser->foundation_id => 'Foundation ' . $authUser->foundation_id]
-                            : [];
-                    })
-                    ->default($authUser->foundation_id ?? null),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
