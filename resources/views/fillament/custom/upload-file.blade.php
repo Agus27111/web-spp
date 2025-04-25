@@ -15,11 +15,25 @@
 {{-- Form Upload CSV --}}
 <div wire:submit.prevent="save" class="space-y-4">
     <form wire:submit.prevent="save" enctype="multipart/form-data">
+        {{-- Pilihan Foundation untuk Superadmin --}}
+        @if (auth()->user()->role === 'superadmin')
+            <div class="mb-4">
+                <label for="foundation" class="block text-sm font-medium text-gray-700">Foundation</label>
+                <select id="foundation" wire:model="selectedFoundation" class="block w-full mt-1 text-sm text-gray-500">
+                    <option value="">-- Select Foundation --</option>
+                    @foreach ($foundations as $foundation)
+                        <option value="{{ $foundation->id }}">{{ $foundation->name }}</option>
+                    @endforeach
+                </select>
+                @error('selectedFoundation') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+        @endif
+
+        {{-- File Input --}}
         <input type="file" wire:model="file"
             class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
             file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700
             hover:file:bg-blue-100" />
-
 
         @if ($file)
             <div class="text-green-600 font-medium flex items-center gap-2">

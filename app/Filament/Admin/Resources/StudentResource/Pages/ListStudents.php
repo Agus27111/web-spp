@@ -10,6 +10,8 @@ use Filament\Actions\Imports\Events\ImportStarted;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Foundation;
+use Illuminate\Support\Facades\Auth;
 
 class ListStudents extends ListRecords
 {
@@ -19,6 +21,7 @@ class ListStudents extends ListRecords
      * @var \Livewire\TemporaryUploadedFile|null
      */
     public $file;
+    public $selectedFoundation;
 
     protected function getHeaderActions(): array
     {
@@ -29,8 +32,12 @@ class ListStudents extends ListRecords
 
     public function getHeader(): ?View
     {
-        $data = Actions\CreateAction::make();
-        return view('fillament.custom.upload-file', ['data' => $data, 'file' => $this->file]);
+        $foundations = Foundation::all();
+        return view('fillament.custom.upload-file', [
+            'data' => Actions\CreateAction::make(),
+            'file' => $this->file,
+            'foundations' => $foundations,
+        ]);
     }
 
 
@@ -39,9 +46,15 @@ class ListStudents extends ListRecords
     {
         $this->validate([
             'file' => 'required|file|mimes:csv,xlsx,xls',
+            // Jika superadmin, kita pastikan foundation dipilih
+            'selectedFoundation' => Auth::user()->role === 'superadmin' ? 'required' : '',
         ]);
 
-        Excel::import(new StudentsImport, $this->file->getRealPath());
+        $foundationId = Auth::user()->role === 'superadmin'
+            ? $this->selectedFoundation
+            : Auth::user()->foundation_id;
+
+        Excel::import(new StudentsImport($foundationId), $this->file->getRealPath());
 
         Notification::make()
             ->title('Saved successfully')
