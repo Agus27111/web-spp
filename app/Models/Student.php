@@ -25,5 +25,10 @@ class Student extends Model
     {
         return $this->hasMany(StudentDiscount::class);
     }
+    public function foundation()
+{
+    return $this->belongsTo(Foundation::class);
+}
+
     
 }

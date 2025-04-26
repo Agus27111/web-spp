@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\StudentAcademic;
 use App\Models\Unit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,7 +30,17 @@ class StudentsImport implements OnEachRow, WithHeadingRow
     public function onRow(Row $row)
     {
 
+
         $data = $row->toArray();
+
+        $birthDate = $data['tgl_lahir'];
+
+        try {
+            // Coba parsing otomatis
+            $birthDate = Carbon::parse($birthDate)->format('Y-m-d');
+        } catch (\Exception $e) {
+            $birthDate = null;
+        }
 
         if (!Auth::check()) {
             return;
@@ -48,9 +59,9 @@ class StudentsImport implements OnEachRow, WithHeadingRow
             [
                 'name' => $data['tahun_ajaran'],
                 'foundation_id' => $foundationId
-            ], 
+            ],
             [
-                'is_active' => true 
+                'is_active' => true
             ]
         );
 
@@ -96,7 +107,7 @@ class StudentsImport implements OnEachRow, WithHeadingRow
             [
                 'guardian_id' => $guardian->id,
                 'name' => $data['nama_siswa'],
-                'birth_date' => $data['tgl_lahir'],
+                'birth_date' => $birthDate,
                 'foundation_id' => $foundationId,
             ]
         );
