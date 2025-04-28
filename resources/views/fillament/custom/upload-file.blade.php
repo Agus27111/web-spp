@@ -25,15 +25,19 @@
                         <option value="{{ $foundation->id }}">{{ $foundation->name }}</option>
                     @endforeach
                 </select>
-                @error('selectedFoundation') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                @error('selectedFoundation')
+                    <span class="text-red-500 text-xs">{{ $message }}</span>
+                @enderror
             </div>
         @endif
 
         {{-- File Input --}}
         <input type="file" wire:model="file"
-            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-            file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100" />
+            class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
+        file:rounded-lg file:border-0 file:text-sm file:font-semibold 
+        file:bg-primary-600 file:text-white
+        hover:file:bg-primary-700" />
+
 
         @if ($file)
             <div class="text-green-600 font-medium flex items-center gap-2">

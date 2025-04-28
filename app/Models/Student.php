@@ -26,9 +26,11 @@ class Student extends Model
         return $this->hasMany(StudentDiscount::class);
     }
     public function foundation()
-{
-    return $this->belongsTo(Foundation::class);
-}
-
-    
+    {
+        return $this->belongsTo(Foundation::class);
+    }
+    public function latestStudentAcademic()
+    {
+        return $this->hasOne(StudentAcademic::class)->latestOfMany();
+    }
 }

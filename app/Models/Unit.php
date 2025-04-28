@@ -14,19 +14,19 @@ class Unit extends Model
 
     protected $fillable = ['foundation_id', 'name'];
 
-     // Event "creating" untuk memastikan foundation_id terisi
-     protected static function booted()
-     {
-         static::creating(function ($unit) {
-             if (Auth::user()->role === 'superadmin') {
-                 if (empty($unit->foundation_id)) {
-                     $unit->foundation_id = request()->input('foundation_id');
-                 }
-             } else {
-                 $unit->foundation_id = Auth::user()->foundation_id;
-             }
-         });
-     }
+    // Event "creating" untuk memastikan foundation_id terisi
+    protected static function booted()
+    {
+        static::creating(function ($unit) {
+            if (Auth::user()->role === 'superadmin') {
+                if (empty($unit->foundation_id)) {
+                    $unit->foundation_id = request()->input('foundation_id');
+                }
+            } else {
+                $unit->foundation_id = Auth::user()->foundation_id;
+            }
+        });
+    }
 
     public function foundation()
     {
@@ -42,5 +42,12 @@ class Unit extends Model
         return $this->belongsToMany(AcademicYear::class);
     }
 
+    public function scopeForFoundation($query)
+    {
+        if (Auth::user()->role === 'superadmin') {
+            return $query;
+        }
 
+        return $query->where('units.foundation_id', Auth::user()->foundation_id);
+    }
 }

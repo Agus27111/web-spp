@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\AcademicYear;
+use App\Models\AcademicYearUnit;
 use App\Models\Classroom;
 use App\Models\Foundation;
 use App\Models\Guardian;
@@ -73,12 +74,19 @@ class StudentsImport implements OnEachRow, WithHeadingRow
             ]
         );
 
+        AcademicYearUnit::firstOrCreate([
+            'academic_year_id' => $academicYear->id,
+            'unit_id' => $unit->id,
+            'foundation_id' => $foundationId,
+        ]);
+
         // Buat atau ambil kelas
         $class = Classroom::firstOrCreate(
             [
                 'name' => $data['nama_kelas'],
                 'foundation_id' => $foundationId,
-                'unit_id' => $unit->id
+                'unit_id' => $unit->id,
+                'academic_year_id' => $academicYear->id,
             ]
         );
 

@@ -17,7 +17,8 @@ trait BelongsToFoundation
 
         static::addGlobalScope('foundation', function (Builder $builder) {
             if (Auth::check() && isset(Auth::user()->foundation_id)) {
-                $builder->where('foundation_id', Auth::user()->foundation_id);
+                $table = $builder->getModel()->getTable();
+                $builder->where("{$table}.foundation_id", Auth::user()->foundation_id);
             }
         });
     }
@@ -26,4 +27,14 @@ trait BelongsToFoundation
     {
         return $this->belongsTo(\App\Models\Foundation::class);
     }
+
+    public function scopeForFoundation($query)
+    {
+        if (Auth::check() && Auth::user()->role !== 'superadmin') {
+            $table = $query->getModel()->getTable();
+            return $query->where("{$table}.foundation_id", Auth::user()->foundation_id);
+        }
+        return $query;
+    }
 }
+

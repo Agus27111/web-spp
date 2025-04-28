@@ -25,7 +25,7 @@ class StudentAcademic extends Model
     }
     public function classroom()
     {
-        return $this->belongsTo(Classroom::class);
+        return $this->belongsTo(Classroom::class, 'class_id');
     }
     public function discounts()
     {

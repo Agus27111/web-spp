@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class StudentResource extends Resource
 {
@@ -70,7 +71,7 @@ class StudentResource extends Resource
                                 Forms\Components\DatePicker::make('birth_date')
                                     ->label('Tanggal Lahir')
                                     ->required(),
-                                    Forms\Components\Repeater::make('studentAcademics')
+                                Forms\Components\Repeater::make('studentAcademics')
                                     ->relationship('studentAcademics')
                                     ->label('Tahun Akademik')
                                     ->schema([
@@ -103,26 +104,35 @@ class StudentResource extends Resource
             ]);
     }
 
-
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'latestStudentAcademic.classroom',
+                'studentAcademics.academicYear',
+            ]);
+    }
 
     public static function table(Table $table): Table
     {
         return $table
+
             ->columns([
+                Tables\Columns\TextColumn::make('foundation.name')
+                    ->label('Foundation')
+                    ->visible(fn() => Auth::user()->role === 'superadmin')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('studentAcademics.academicYear.name')
                     ->label('Tahun Akademik'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nisn')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('studentAcademics.class.name')
-                    ->label('Kelas'),
+                Tables\Columns\TextColumn::make('latestStudentAcademic.classroom.name')
+                    ->label('Kelas')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('guardian.name')
                     ->label('Nama Orang Tua')
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\TextColumn::make('birth_date')
-                    ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()

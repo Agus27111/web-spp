@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\AcademicManagementResource\Pages;
 use App\Models\AcademicYear;
 use App\Models\Foundation;
+use App\Models\Unit;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,21 +18,26 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class AcademicManagementResource extends Resource
 {
     protected static ?string $model = AcademicYear::class;
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([SoftDeletingScope::class])
-            ->withCount(['units', 'classrooms']);
-    }
-
     protected static ?string $navigationLabel = 'Tahun Ajaran';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+
+    // public static function getEloquentQuery(): Builder
+    // {
+    //     return parent::getEloquentQuery()
+    //         ->withoutGlobalScopes([SoftDeletingScope::class])
+    //         ->where('foundation_id', Auth::user()->foundation_id)
+    //         ->withCount(['units', 'classrooms']);
+    // }
+
+
 
     public static function form(Form $form): Form
     {
@@ -55,27 +61,23 @@ class AcademicManagementResource extends Resource
 
                         Forms\Components\Tabs\Tab::make('Unit Lembaga')
                             ->schema([
-                                Forms\Components\Repeater::make('units')
-                                    ->relationship('units')
-                                    ->schema([
-                                        Forms\Components\Select::make('name')
+                                Forms\Components\Select::make('units')
+                                    ->label('Pilih Unit')
+                                    ->multiple()
+                                    ->relationship('units', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')
                                             ->label('Nama Unit')
-                                            ->options([
-                                                'kober' => 'Kober',
-                                                'tk' => 'TK',
-                                                'sd' => 'SD',
-                                                'smp' => 'SMP',
-                                                'sma' => 'SMA',
-                                                'universitas' => 'Universitas',
-                                            ])
                                             ->required(),
-                                        Forms\Components\Select::make('foundation_id')
-                                            ->label('Foundation')
-                                            ->options(Foundation::all()->pluck('name', 'id'))
-                                            ->required()
-                                            ->visible(fn() => Auth::user()->role === 'superadmin'),
-                                    ])
+                                    ]),
 
+                                Forms\Components\Select::make('foundation_id')
+                                    ->label('Foundation')
+                                    ->options(Foundation::forUser()->pluck('name', 'id'))
+                                    ->required()
+                                    ->visible(fn() => Auth::user()->role === 'superadmin'),
                             ]),
 
                         Forms\Components\Tabs\Tab::make('Kelas')
@@ -89,16 +91,10 @@ class AcademicManagementResource extends Resource
 
                                         Forms\Components\Select::make('unit_id')
                                             ->label('Unit')
-                                            ->options(function (callable $get) {
-                                                $rootUnits = $get('../../units') ?? [];
-
-                                                return collect($rootUnits)
-                                                    ->filter(fn($unit) => isset($unit['name']) && is_string($unit['name']))
-                                                    ->pluck('name', 'name');
-                                            })
+                                            ->options(Unit::pluck('name', 'id'))
+                                            ->searchable()
                                             ->required(),
                                     ])
-
                             ]),
                     ])
                     ->columnSpanFull()
@@ -106,15 +102,25 @@ class AcademicManagementResource extends Resource
             ]);
     }
 
+
     public static function table(Table $table): Table
     {
         return $table
+            ->query(
+                AcademicYear::query()
+                    ->withCount('units', 'classrooms')
+            )
             ->columns([
+                Tables\Columns\TextColumn::make('foundation.name')
+                    ->label('Foundation')
+                    ->visible(fn() => Auth::user()->role === 'superadmin')
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Tahun Akademik')
                     ->searchable(),
 
-                Tables\Columns\IconColumn::make('is_activ')
+                Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->label('Aktif')
                     ->trueIcon('heroicon-m-check-circle')
@@ -123,11 +129,9 @@ class AcademicManagementResource extends Resource
                     ->falseColor('danger'),
 
                 Tables\Columns\TextColumn::make('units_count')
-                    ->counts('units')
                     ->label('Jumlah Unit'),
 
                 Tables\Columns\TextColumn::make('classrooms_count')
-                    ->counts('classrooms')
                     ->label('Jumlah Kelas'),
             ])
             ->actions([

@@ -5,14 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Foundation extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['foundation_id', 'name', 'address', 'image', 'phone_number'];
+    protected $fillable = ['name', 'address', 'image', 'phone_number'];
 
-    // Relasi Foundation -> User (Admin/Manager)
+    public function scopeForUser($query)
+    {
+        if (Auth::user()->role === 'superadmin') {
+            return $query; // superadmin boleh lihat semua foundation
+        }
+
+        return $query->where('foundations.id', Auth::user()->foundation_id);
+    }
     public function user()
     {
         return $this->belongsTo(User::class);
