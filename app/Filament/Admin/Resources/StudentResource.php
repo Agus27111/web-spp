@@ -3,20 +3,25 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\StudentResource\Pages;
-use App\Filament\Admin\Resources\StudentResource\RelationManagers;
+use App\Models\Classroom;
+use App\Models\Foundation;
 use App\Models\Student;
+use App\Models\Unit;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\Action;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentsExport;
+use Symfony\Component\HttpFoundation\Response;
 
 class StudentResource extends Resource
 {
@@ -34,12 +39,41 @@ class StudentResource extends Resource
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('Orang Tua')
                             ->schema([
+                                Select::make('foundation_id')
+                                    ->label('Yayasan / Foundation')
+                                    ->options(function () {
+                                        $user = Auth::user();
+                                        if ($user->role === 'superadmin') {
+                                            return Foundation::pluck('name', 'id');
+                                        }
+
+                                        // Operator hanya melihat yayasan mereka
+                                        return Foundation::where('id', $user->foundation_id)->pluck('name', 'id');
+                                    })
+                                    ->default(function () {
+                                        $user = Auth::user();
+                                        return $user->foundation_id;
+                                    })
+                                    ->disabled(fn() => Auth::user()->role !== 'superadmin')
+                                    ->required()
+                                    ->columnSpanFull(),
+
                                 Select::make('guardian_id')
                                     ->label('Pilih / Tambah Orang Tua')
                                     ->relationship('guardian', 'name')
                                     ->searchable()
                                     ->preload()
                                     ->createOptionForm([
+                                        Select::make('foundation_id')
+                                            ->label('Yayasan')
+                                            ->options(Foundation::pluck('name', 'id'))
+                                            ->required()
+                                            ->visible(fn() => Auth::user()->role === 'superadmin'),
+
+                                        Hidden::make('foundation_id')
+                                            ->default(fn() => Auth::user()->foundation_id)
+                                            ->visible(fn() => Auth::user()->role !== 'superadmin'),
+
                                         TextInput::make('name')
                                             ->label('Nama Orang Tua')
                                             ->required(),
@@ -80,9 +114,33 @@ class StudentResource extends Resource
                                             ->relationship('academicYear', 'name')
                                             ->required(),
 
+                                        Select::make('unit_id')
+                                            ->label('Unit')
+                                            ->options(function () {
+                                                $user = Auth::user();
+                                                if ($user->role === 'superadmin') {
+                                                    return Unit::all()->pluck('name', 'id');
+                                                }
+
+                                                return Unit::where('foundation_id', $user->foundation_id)->pluck('name', 'id');
+                                            })
+                                            ->disabled(function () {
+                                                return Auth::user()->role !== 'superadmin';
+                                            })
+                                            ->reactive()
+                                            ->afterStateUpdated(fn(callable $set) => $set('class_id', null)),
+
                                         Forms\Components\Select::make('class_id')
                                             ->label('Kelas')
-                                            ->relationship('classroom', 'name')
+                                            ->options(function (callable $get) {
+                                                $unitId = $get('unit_id');
+                                                if (!$unitId) {
+                                                    return [];
+                                                }
+
+                                                return Classroom::where('unit_id', $unitId)
+                                                    ->pluck('name', 'id');
+                                            })
                                             ->required(),
 
                                         Forms\Components\Select::make('status')
@@ -153,9 +211,14 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            // ->headerActions([
-            //     Tables\Actions\CreateAction::make(),
-            // ])
+            ->headerActions([
+                Action::make('Export Excel')
+                    ->label('Export')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function (): Response {
+                        return Excel::download(new StudentsExport, 'students.xlsx');
+                    }),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

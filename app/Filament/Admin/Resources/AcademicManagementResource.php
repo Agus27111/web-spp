@@ -3,9 +3,12 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AcademicManagementResource\Pages;
+use App\Filament\Admin\Resources\AcademicManagementResource\RelationManagers\ClassroomsRelationManager;
+use App\Filament\Admin\Resources\AcademicManagementResource\RelationManagers\UnitsRelationManager;
 use App\Models\AcademicYear;
 use App\Models\Foundation;
 use App\Models\Unit;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -28,79 +31,53 @@ class AcademicManagementResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-
-    // public static function getEloquentQuery(): Builder
-    // {
-    //     return parent::getEloquentQuery()
-    //         ->withoutGlobalScopes([SoftDeletingScope::class])
-    //         ->where('foundation_id', Auth::user()->foundation_id)
-    //         ->withCount(['units', 'classrooms']);
-    // }
-
-
+    protected static ?string $titleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('Academic Tabs')
-                    ->tabs([
-                        Forms\Components\Tabs\Tab::make('Tahun Akademik')
-                            ->schema([
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Forms\Components\Select::make('foundation_id')
+                            ->label('Foundation')
+                            ->options(Foundation::query()->pluck('name', 'id'))
+                            ->required()
+                            ->visible(fn() => Auth::user()->role === 'superadmin')
+                            ->default(fn() => Auth::user()->foundation_id)
+                            ->disabled(fn() => Auth::user()->role !== 'superadmin')
+                            ->createOptionForm([
                                 Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\Select::make('is_active')
-                                    ->label('Status')
-                                    ->options([
-                                        true => '✅ Aktif',
-                                        false => '❌ Tidak Aktif',
-                                    ])
+                                    ->label('Nama Yayasan')
                                     ->required(),
-                            ]),
+                                Forms\Components\TextInput::make('phone_number')
+                                    ->label('Nomor Telepon')
+                                    ->tel()
+                                    ->required(),
+                            ])
+                            ->createOptionUsing(function (array $data) {
+                                return Foundation::create([
+                                    'name' => $data['name'],
+                                    'phone_number' => $data['phone_number'],
+                                ]);
+                            }),
 
-                        Forms\Components\Tabs\Tab::make('Unit Lembaga')
-                            ->schema([
-                                Forms\Components\Select::make('units')
-                                    ->label('Pilih Unit')
-                                    ->multiple()
-                                    ->relationship('units', 'name')
-                                    ->preload()
-                                    ->searchable()
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Nama Unit')
-                                            ->required(),
-                                    ]),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nama Tahun Akademik')
+                            ->required()
+                            ->maxLength(255),
 
-                                Forms\Components\Select::make('foundation_id')
-                                    ->label('Foundation')
-                                    ->options(Foundation::forUser()->pluck('name', 'id'))
-                                    ->required()
-                                    ->visible(fn() => Auth::user()->role === 'superadmin'),
-                            ]),
-
-                        Forms\Components\Tabs\Tab::make('Kelas')
-                            ->schema([
-                                Forms\Components\Repeater::make('classrooms')
-                                    ->relationship('classrooms')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Nama Kelas')
-                                            ->required(),
-
-                                        Forms\Components\Select::make('unit_id')
-                                            ->label('Unit')
-                                            ->options(Unit::pluck('name', 'id'))
-                                            ->searchable()
-                                            ->required(),
-                                    ])
-                            ]),
+                        Forms\Components\Select::make('is_active')
+                            ->label('Status')
+                            ->options([
+                                true => '✅ Aktif',
+                                false => '❌ Tidak Aktif',
+                            ])
+                            ->required(),
                     ])
-                    ->columnSpanFull()
-                    ->contained(),
             ]);
     }
+
 
 
     public static function table(Table $table): Table
@@ -135,11 +112,7 @@ class AcademicManagementResource extends Resource
                     ->label('Jumlah Kelas'),
             ])
             ->actions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
+                Tables\Actions\EditAction::make(),
             ]);
     }
 
@@ -147,7 +120,8 @@ class AcademicManagementResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UnitsRelationManager::class,
+            ClassroomsRelationManager::class,
         ];
     }
 
@@ -158,5 +132,12 @@ class AcademicManagementResource extends Resource
             'create' => Pages\CreateAcademicManagement::route('/create'),
             'edit' => Pages\EditAcademicManagement::route('/{record}/edit'),
         ];
+    }
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                // Add any scopes you don't want here
+            ]);
     }
 }

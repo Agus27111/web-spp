@@ -33,8 +33,7 @@ class Payment extends Model
         return $this->belongsTo(Fee::class);
     }
     public function foundation()
-{
-    return $this->belongsTo(Foundation::class);
-}
-
+    {
+        return $this->belongsTo(Foundation::class);
+    }
 }

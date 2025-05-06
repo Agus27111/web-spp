@@ -33,4 +33,9 @@ class Student extends Model
     {
         return $this->hasOne(StudentAcademic::class)->latestOfMany();
     }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }

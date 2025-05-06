@@ -23,7 +23,7 @@ class AcademicYear extends Model
 
     public function studentAcademics()
     {
-        return $this->hasMany(StudentAcademic::class);
+        return $this->hasMany(StudentAcademic::class, 'academic_year_id');
     }
 
     public function fees()
@@ -45,10 +45,10 @@ class AcademicYear extends Model
             ->when(Auth::check() && Auth::user()->role !== 'superadmin', function ($query) {
                 $query->where('units.foundation_id', Auth::user()->foundation_id);
             })
+            ->using(\App\Models\AcademicYearUnit::class)
+            ->withPivot('foundation_id')
             ->withTimestamps();
     }
-
-
 
     public function classrooms()
     {

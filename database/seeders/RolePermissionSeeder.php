@@ -42,6 +42,7 @@ class RolePermissionSeeder extends Seeder
             'manage-foundations',
             'manage-users',
             'manage-expenses',
+            'view-dashboard'
         ]);
 
         $operator = Role::firstOrCreate(['name' => 'operator', 'guard_name' => 'web']);
@@ -51,6 +52,7 @@ class RolePermissionSeeder extends Seeder
             'manage-payments',
             'manage-fee-types',
             'manage-discounts',
+            'view-dashboard'
         ]);
 
         $parent = Role::firstOrCreate(['name' => 'parent', 'guard_name' => 'web']);

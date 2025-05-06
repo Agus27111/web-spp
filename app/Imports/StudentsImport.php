@@ -128,6 +128,7 @@ class StudentsImport implements OnEachRow, WithHeadingRow
             ],
             [
                 'class_id' => $class->id,
+                'unit_id' => $unit->id,
                 'status' => $data['status'],
                 'foundation_id' => $foundationId,
             ]

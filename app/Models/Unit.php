@@ -37,10 +37,6 @@ class Unit extends Model
     {
         return $this->hasMany(Classroom::class);
     }
-    public function academicYears()
-    {
-        return $this->belongsToMany(AcademicYear::class);
-    }
 
     public function scopeForFoundation($query)
     {
@@ -49,5 +45,17 @@ class Unit extends Model
         }
 
         return $query->where('units.foundation_id', Auth::user()->foundation_id);
+    }
+
+    public function studentAcademics()
+    {
+        return $this->hasMany(StudentAcademic::class, 'unit_id');
+    }
+
+    public function academicYears()
+    {
+        return $this->belongsToMany(AcademicYear::class, 'academic_year_unit')
+                    ->withPivot('foundation_id')
+                    ->withTimestamps();
     }
 }

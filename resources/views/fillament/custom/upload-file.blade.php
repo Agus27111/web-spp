@@ -14,51 +14,23 @@
 
 {{-- Form Upload CSV --}}
 <div wire:submit.prevent="save" class="space-y-4">
-    <form wire:submit.prevent="save" enctype="multipart/form-data">
-        {{-- Pilihan Foundation untuk Superadmin --}}
-        @if (auth()->user()->role === 'superadmin')
-            <div class="mb-4">
-                <label for="foundation" class="block text-sm font-medium text-gray-700">Foundation</label>
-                <select id="foundation" wire:model="selectedFoundation" class="block w-full mt-1 text-sm text-gray-500">
-                    <option value="">-- Select Foundation --</option>
-                    @foreach ($foundations as $foundation)
-                        <option value="{{ $foundation->id }}">{{ $foundation->name }}</option>
-                    @endforeach
-                </select>
-                @error('selectedFoundation')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                @enderror
-            </div>
-        @endif
+    <form wire:submit.prevent="save" class="w-full max-w-sm flex flex-col mt-2">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="fileInput">
+                Pilih Berkas
+            </label>
+            <input
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="fileInput" type="file" wire:model="file" />
+        </div>
 
-        {{-- File Input --}}
-        <input type="file" wire:model="file"
-            class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
-        file:rounded-lg file:border-0 file:text-sm file:font-semibold 
-        file:bg-primary-600 file:text-white
-        hover:file:bg-primary-700" />
-
-
-        @if ($file)
-            <div class="text-green-600 font-medium flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                File berhasil dipilih
-            </div>
-        @endif
-
-        {{-- Tombol Upload --}}
-        <button type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-            wire:loading.attr="disabled">
-            <span wire:loading.remove>Upload</span>
-            <svg wire:loading class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                </circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-            </svg>
-        </button>
+        <div class="flex items-center justify-between mt-3">
+            <button
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit">
+                Unggah
+            </button>
+            
+        </div>
     </form>
 </div>

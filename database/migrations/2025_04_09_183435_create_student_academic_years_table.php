@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('students');
             $table->foreignId('academic_year_id')->constrained('academic_years');
             $table->foreignId('class_id')->constrained('classes');
+            $table->foreignId('unit_id')->constrained()->after('class_id');
             $table->enum('status', ['active', 'graduated', 'left']);
             $table->softDeletes();
             $table->timestamps();
