@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Filament\Forms\Components\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,21 +16,20 @@ class AcademicYearUnit extends Pivot
         'unit_id',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (empty($model->foundation_id) && Auth::check()) {
-                $model->foundation_id = Auth::user()->foundation_id;
-            }
-        });
+    // protected static function booted()
+    // {
+    //     static::creating(function ($model) {
+    //         if (empty($model->foundation_id) && Auth::check()) {
+    //             $model->foundation_id = Auth::user()->foundation_id;
+    //         }
+    //     });
 
-        // Tambah global scope foundation di pivot model juga
-        static::addGlobalScope('foundation', function (Builder $builder) {
-            if (Auth::check() && Auth::user()->role !== 'superadmin') {
-                $builder->where('foundation_id', Auth::user()->foundation_id);
-            }
-        });
-    }
+    //     static::addGlobalScope('foundation', function (Builder $builder) {
+    //         if (Auth::check() && Auth::user()->role !== 'superadmin') {
+    //             $builder->where('foundation_id', Auth::user()->foundation_id);
+    //         }
+    //     });
+    // }
 
     public function foundation()
     {
@@ -42,12 +41,8 @@ class AcademicYearUnit extends Pivot
         return $this->belongsTo(AcademicYear::class);
     }
 
-    public function units()
+    public function unit()
     {
-        return $this->belongsToMany(Unit::class, 'academic_year_unit', 'academic_year_id', 'unit_id')
-            ->when(Auth::check() && Auth::user()->role !== 'superadmin', function ($query) {
-                $query->where('units.foundation_id', Auth::user()->foundation_id);
-            })
-            ->withTimestamps();
+        return $this->belongsTo(Unit::class);
     }
 }

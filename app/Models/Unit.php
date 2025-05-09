@@ -7,26 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\BelongsToFoundation;
+use Illuminate\Support\Facades\Log;
 
 class Unit extends Model
 {
     use HasFactory, SoftDeletes, BelongsToFoundation;
 
-    protected $fillable = ['foundation_id', 'name'];
+    protected $fillable  = ['name', 'foundation_id'];
+    protected $visible  = ['name', 'foundation_id'];
 
-    // Event "creating" untuk memastikan foundation_id terisi
     protected static function booted()
     {
-        static::creating(function ($unit) {
-            if (Auth::user()->role === 'superadmin') {
-                if (empty($unit->foundation_id)) {
-                    $unit->foundation_id = request()->input('foundation_id');
-                }
-            } else {
-                $unit->foundation_id = Auth::user()->foundation_id;
-            }
+        static::creating(function ($model) {
+            Log::info('Unit Model Booted - Before Trait', $model->toArray());
+        });
+
+        static::created(function ($model) {
+            Log::info('Unit Model Booted - After Create', $model->toArray());
         });
     }
+
+    // Hapus event creating dari model karena sudah ada di trait
+    // Pindahkan logika ke trait atau sebaliknya, jangan duplikasi
 
     public function foundation()
     {
@@ -55,7 +57,8 @@ class Unit extends Model
     public function academicYears()
     {
         return $this->belongsToMany(AcademicYear::class, 'academic_year_unit')
-                    ->withPivot('foundation_id')
-                    ->withTimestamps();
+            ->using(AcademicYearUnit::class)
+            ->withPivot('foundation_id')
+            ->withTimestamps();
     }
 }

@@ -41,14 +41,12 @@ class AcademicYear extends Model
 
     public function units()
     {
-        return $this->belongsToMany(Unit::class, 'academic_year_unit', 'academic_year_id', 'unit_id')
-            ->when(Auth::check() && Auth::user()->role !== 'superadmin', function ($query) {
-                $query->where('units.foundation_id', Auth::user()->foundation_id);
-            })
-            ->using(\App\Models\AcademicYearUnit::class)
+        return $this->belongsToMany(Unit::class, 'academic_year_unit')
+            ->using(AcademicYearUnit::class)
             ->withPivot('foundation_id')
             ->withTimestamps();
     }
+
 
     public function classrooms()
     {
