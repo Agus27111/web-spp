@@ -38,4 +38,9 @@ class StudentAcademic extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'student_academic_year_id');
+    }
 }

@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class FoundationPendingMail extends Mailable implements ShouldQueue
 {
@@ -20,6 +21,7 @@ class FoundationPendingMail extends Mailable implements ShouldQueue
     public function __construct($foundation)
     {
         $this->foundation = $foundation;
+        Log::channel('emails')->info('Creating FoundationPendingMail', ['email' => $foundation->email]);
     }
 
     /**

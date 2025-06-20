@@ -29,7 +29,7 @@ class StudentResource extends Resource
 
     protected static ?string $navigationLabel = 'Siswa';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     public static function form(Form $form): Form
     {
@@ -112,23 +112,37 @@ class StudentResource extends Resource
                                         Forms\Components\Select::make('academic_year_id')
                                             ->label('Tahun Ajaran')
                                             ->relationship('academicYear', 'name')
-                                            ->required(),
+                                            ->required()
+                                            ->reactive(),
 
                                         Select::make('unit_id')
                                             ->label('Unit')
-                                            ->options(function () {
+                                            ->live()
+                                            ->options(function (callable $get) {
                                                 $user = Auth::user();
-                                                if ($user->role === 'superadmin') {
-                                                    return Unit::all()->pluck('name', 'id');
+                                                $academicYearId = $get('academic_year_id');
+
+                                                if (!$academicYearId) {
+                                                    return [];
                                                 }
 
-                                                return Unit::where('foundation_id', $user->foundation_id)->pluck('name', 'id');
+                                                // Debugging
+                                                logger()->info('Academic Year ID: ' . $academicYearId);
+
+                                                $units = Unit::whereHas('academicYears', function ($query) use ($academicYearId) {
+                                                    $query->where('academic_years.id', $academicYearId);
+                                                })
+                                                    ->when($user->role !== 'superadmin', function ($query) use ($user) {
+                                                        $query->where('units.foundation_id', $user->foundation_id);
+                                                    })
+                                                    ->get();
+
+                                                logger()->info('Units found: ' . $units->count());
+
+                                                return $units->pluck('name', 'id');
                                             })
-                                            ->disabled(function () {
-                                                return Auth::user()->role !== 'superadmin';
-                                            })
-                                            ->reactive()
-                                            ->afterStateUpdated(fn(callable $set) => $set('class_id', null)),
+                                            ->required(),
+
 
                                         Forms\Components\Select::make('class_id')
                                             ->label('Kelas')
@@ -141,6 +155,7 @@ class StudentResource extends Resource
                                                 return Classroom::where('unit_id', $unitId)
                                                     ->pluck('name', 'id');
                                             })
+                                            ->live()
                                             ->required(),
 
                                         Forms\Components\Select::make('status')

@@ -24,7 +24,9 @@ class FoundationResource extends Resource
 
     protected static ?string $navigationLabel = 'Yayasan';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
 
     //mengatur hanya superadmin bisaliat semua, foundation hanya dirinya

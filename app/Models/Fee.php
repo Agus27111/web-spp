@@ -11,7 +11,7 @@ class Fee extends Model
 {
     use HasFactory, SoftDeletes, BelongsToFoundation;
 
-    protected $fillable = ['foundation_id', 'fee_type_id', 'academic_year_id', 'class_id', 'amount'];
+    protected $fillable = ['fee_type_id', 'foundation_id', 'academic_year_id', 'amount'];
 
     public function feeType()
     {

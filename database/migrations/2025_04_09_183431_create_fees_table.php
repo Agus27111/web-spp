@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('fees', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('fee_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('foundation_id')->constrained()->onDelete('cascade');
-            $table->foreignId('fee_type_id')->constrained('fee_types');
-            $table->foreignId('academic_year_id')->constrained('academic_years');
-            $table->foreignId('class_id')->constrained('classes');
-            $table->integer('amount');
-            $table->softDeletes();
+            $table->foreignId('academic_year_id')->constrained()->onDelete('cascade');
+            $table->decimal('amount', 12, 2);
+            $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

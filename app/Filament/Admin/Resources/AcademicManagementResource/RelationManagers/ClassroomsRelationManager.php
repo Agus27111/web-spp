@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\Auth;
 class ClassroomsRelationManager extends RelationManager
 {
     protected static string $relationship = 'classrooms';
+
+    // Label untuk judul relation manager
+    protected static ?string $title = 'Kelas';
+
+    // Label untuk model (digunakan di beberapa action)
+    protected static ?string $modelLabel = 'kelas';
+
+    // Label plural untuk model
+    protected static ?string $pluralModelLabel = 'daftar kelas';
+
     protected static ?string $titleAttribute = 'name';
 
     public function form(Form $form): Form
