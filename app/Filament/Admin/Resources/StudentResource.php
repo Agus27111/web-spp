@@ -218,6 +218,11 @@ class StudentResource extends Resource
                     ->action(function (): Response {
                         return Excel::download(new StudentsExport, 'students.xlsx');
                     }),
+                Action::make('Download Template')
+                    ->label('Download Template')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->url(asset('storage/templates/template_import_siswa.xlsx'))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

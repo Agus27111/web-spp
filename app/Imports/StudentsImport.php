@@ -56,7 +56,7 @@ class StudentsImport implements OnEachRow, WithHeadingRow
         }
 
         // Lanjutkan proses import seperti biasa...
-        $academicYear = AcademicYear::firstOrCreate(
+        $academicYear = AcademicYear::updateOrCreate(
             [
                 'name' => $data['tahun_ajaran'],
                 'foundation_id' => $foundationId
