@@ -14,18 +14,17 @@ class Unit extends Model
     use HasFactory, SoftDeletes, BelongsToFoundation;
 
     protected $fillable  = ['name', 'foundation_id'];
-    protected $visible  = ['name', 'foundation_id'];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            Log::info('Unit Model Booted - Before Trait', $model->toArray());
-        });
+    // protected static function booted()
+    // {
+    //     static::creating(function ($model) {
+    //         Log::info('Unit Model Booted - Before Trait', $model->toArray());
+    //     });
 
-        static::created(function ($model) {
-            Log::info('Unit Model Booted - After Create', $model->toArray());
-        });
-    }
+    //     static::created(function ($model) {
+    //         Log::info('Unit Model Booted - After Create', $model->toArray());
+    //     });
+    // }
 
     // Hapus event creating dari model karena sudah ada di trait
     // Pindahkan logika ke trait atau sebaliknya, jangan duplikasi

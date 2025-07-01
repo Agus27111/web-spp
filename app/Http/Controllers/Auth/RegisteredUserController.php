@@ -15,7 +15,9 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Mail\FoundationPendingMail;
 use App\Mail\NewFoundationRequestMail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class RegisteredUserController extends Controller
 {
@@ -36,14 +38,20 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:foundation_requests'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email',
+                Rule::unique('foundation_requests', 'email')->whereNull('deleted_at')
+            ],
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
 
-        DB::beginTransaction();
-
         try {
+            // Create without transaction first
             $foundation = FoundationRequest::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -52,16 +60,20 @@ class RegisteredUserController extends Controller
                 'status' => 'pending',
             ]);
 
-            Mail::to($request->email)->queue(new FoundationPendingMail($foundation));
-            Mail::to(env('ADMIN_EMAIL'))->queue(new NewFoundationRequestMail($foundation));
+            // Send emails synchronously (important for debugging)
+            Mail::to($request->email)->send(new FoundationPendingMail($foundation));
 
-            DB::commit();
+            // Send to admin - with failover
+            try {
+                Mail::to(config('mail.admin_address'))->send(new NewFoundationRequestMail($foundation));
+            } catch (\Exception $e) {
+                Log::error('Admin email failed: ' . $e->getMessage());
+            }
 
-            return redirect('/login')->with('status', 'Pendaftaran berhasil. Silakan cek email untuk info selanjutnya.');
+            return redirect('/login')->with('status', 'Pendaftaran berhasil! Cek email Anda.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan jika ada error
-
-            return back()->withErrors(['error' => 'Terjadi kesalahan. Silakan coba lagi.']);
+            Log::error('Registration failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Pendaftaran gagal. Error: ' . $e->getMessage()]);
         }
     }
 }

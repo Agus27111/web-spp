@@ -25,7 +25,9 @@ class FoundationRequestResource extends Resource
 {
     protected static ?string $model = FoundationRequest::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Pendaftaran Yayasan';
+
+    protected static ?string $navigationIcon = 'heroicon-o-document-arrow-up';
 
     public static function getNavigationBadge(): ?string
     {

@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\Log;
 class UnitsRelationManager extends RelationManager
 {
     protected static string $relationship = 'units';
+
+    // Label untuk judul relation manager
+    protected static ?string $title = 'Jenjang';
+
+    // Label untuk model (digunakan di beberapa action)
+    protected static ?string $modelLabel = 'Jenjang';
+
+    // Label plural untuk model
+    protected static ?string $pluralModelLabel = 'Daftar Jenjang';
+
     protected static ?string $titleAttribute = 'name';
 
     public function form(Form $form): Form

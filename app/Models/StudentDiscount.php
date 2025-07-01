@@ -11,19 +11,24 @@ class StudentDiscount extends Model
 {
     use HasFactory, SoftDeletes, BelongsToFoundation;
 
-    protected $fillable = ['foundation_id', 'student_year_id', 'fee_type_id', 'discount_id'];
+    protected $fillable = ['foundation_id', 'student_id', 'fee_type_id', 'discount_id', 'is_active'];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
+    public function foundation()
+    {
+        return $this->belongsTo(Foundation::class);
+    }
+
+    public function feeType()
+    {
+        return $this->belongsTo(FeeType::class);
+    }
+
     public function discount()
     {
-        return $this->belongsTo(Discount::class);
+        return $this->belongsTo(Discount::class)->where('is_active', true);
     }
-    public function foundation()
-{
-    return $this->belongsTo(Foundation::class);
-}
-
 }

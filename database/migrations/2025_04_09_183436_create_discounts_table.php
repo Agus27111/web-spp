@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('foundation_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->integer('amount');
+            $table->boolean('is_active')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

@@ -39,14 +39,22 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
+            'host' => env('MAIL_HOST', 'smtp.gmail.com'),
+            'port' => env('MAIL_PORT', 465),
+            'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+
+            'stream' => [
+                'ssl' => [
+                    'allow_self_signed' => true,
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+                ],
+            ],
         ],
 
         'ses' => [
@@ -109,10 +117,11 @@ return [
     | used globally for all emails that are sent by your application.
     |
     */
-
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'agussetiawanbelajar@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'Web SPP'),
     ],
 
+
+    'admin_address' => env('ADMIN_EMAIL', 'agussetiawanbelajar@gmail.com'),
 ];

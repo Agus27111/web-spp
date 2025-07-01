@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('student_discounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('foundation_id')->constrained()->onDelete('cascade');
-            $table->foreignId('student_academic_year_id')->constrained('student_academic_years');
+            $table->foreignId('student_id')->constrained();
             $table->foreignId('fee_type_id')->constrained('fee_types');
             $table->foreignId('discount_id')->constrained('discounts');
+            $table->boolean('is_active')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\Auth;
 class ClassroomsRelationManager extends RelationManager
 {
     protected static string $relationship = 'classrooms';
+
+    // Label untuk judul relation manager
+    protected static ?string $title = 'Kelas';
+
+    // Label untuk model (digunakan di beberapa action)
+    protected static ?string $modelLabel = 'kelas';
+
+    // Label plural untuk model
+    protected static ?string $pluralModelLabel = 'daftar kelas';
+
     protected static ?string $titleAttribute = 'name';
 
     public function form(Form $form): Form
@@ -27,8 +37,25 @@ class ClassroomsRelationManager extends RelationManager
 
                 Forms\Components\Select::make('unit_id')
                     ->label('Unit')
-                    ->relationship('unit', 'name')
+                    ->relationship(
+                        name: 'unit',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: function (Builder $query) {
+                            $academicYear = $this->getOwnerRecord();
+                            return $query->where('foundation_id', $academicYear->foundation_id)
+                                ->whereHas('academicYears', function ($q) use ($academicYear) {
+                                    $q->where('academic_year_id', $academicYear->id);
+                                });
+                        }
+                    )
                     ->searchable()
+                    ->preload()
+                    ->required(),
+                Forms\Components\Hidden::make('academic_year_id')
+                    ->default($this->getOwnerRecord()->id),
+
+                Forms\Components\Hidden::make('foundation_id')
+                    ->default($this->getOwnerRecord()->foundation_id)
                     ->required(),
             ]);
     }
@@ -36,6 +63,16 @@ class ClassroomsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $academicYear = $this->getOwnerRecord();
+
+                $query->whereHas('unit', function ($q) use ($academicYear) {
+                    $q->where('foundation_id', $academicYear->foundation_id)
+                        ->whereHas('academicYears', function ($q2) use ($academicYear) {
+                            $q2->where('academic_year_id', $academicYear->id);
+                        });
+                });
+            })
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -46,12 +83,15 @@ class ClassroomsRelationManager extends RelationManager
                     ->label('Unit')
                     ->searchable(),
             ])
-            ->filters([
-                //
-            ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label('Tambah Kelas'),
+                    ->label('Tambah Kelas')
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $academicYear = $this->getOwnerRecord();
+                        $data['academic_year_id'] = $academicYear->id;
+                        $data['foundation_id'] = $academicYear->foundation_id;
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

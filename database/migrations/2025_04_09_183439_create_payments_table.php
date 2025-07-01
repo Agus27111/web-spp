@@ -18,11 +18,12 @@ return new class extends Migration
             $table->foreignId('fee_id')->constrained('fees');
             $table->string('month')->nullable();
             $table->date('payment_date');
-            $table->integer('original_amount');
-            $table->integer('discount_applied');
-            $table->integer('paid_amount');
+            $table->integer('original_amount')->default(0);
+            $table->integer('discount_applied')->default(0);
+            $table->integer('paid_amount')->default(0);
             $table->string('payment_method');
-            $table->string('receipt_pdf')->nullable();
+            $table->json('applied_discounts')->nullable();
+            $table->string('payment_proof')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

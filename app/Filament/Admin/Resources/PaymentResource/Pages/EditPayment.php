@@ -14,6 +14,16 @@ class EditPayment extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
+            Actions\Action::make('print')
+                ->label('Cetak Struk')
+                ->url(fn () => $this->getResource()::getUrl('print', ['record' => $this->record]))
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-printer'),
         ];
+    }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return 'Pembayaran berhasil diupdate';
     }
 }

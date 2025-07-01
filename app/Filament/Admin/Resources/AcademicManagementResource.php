@@ -29,7 +29,11 @@ class AcademicManagementResource extends Resource
 
     protected static ?string $navigationLabel = 'Tahun Ajaran';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'tahun ajaran';
+
+    protected static ?string $pluralModelLabel = 'daftar tahun ajaran';
+
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
     protected static ?string $titleAttribute = 'name';
 
