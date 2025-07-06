@@ -19,6 +19,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('name');
             $table->string('frequency')->default('monthly');
+             $table->foreignId('class_id')->nullable()->change();
             $table->softDeletes();
             $table->timestamps();
         });

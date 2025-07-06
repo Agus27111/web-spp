@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\PaymentController;
 use App\Mail\FoundationApprovedMail;
 use App\Mail\FoundationPendingMail;
 use App\Mail\NewFoundationRequestMail;
@@ -56,4 +57,7 @@ Route::get('/test-email', function () {
         ], 500);
     }
 });
+
+Route::get('/payments/{payment}/print', [PaymentController::class, 'print'])->name('payments.print');
+
 require __DIR__ . '/auth.php';

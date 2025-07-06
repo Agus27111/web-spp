@@ -38,4 +38,13 @@ class Student extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+    public function payments()
+{
+    return $this->hasMany(Payment::class, 'student_id');
+}
+
+public function academicYear()
+{
+    return $this->belongsTo(AcademicYear::class);
+}
 }

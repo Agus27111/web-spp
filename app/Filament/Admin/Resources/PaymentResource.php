@@ -33,7 +33,7 @@ class PaymentResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
-            ->with(['foundation', 'studentAcademicYear', 'fee', 'discounts']); // Eager load relasi
+            ->with(['foundation', 'studentAcademicYear', 'fee']); // Eager load relasi
 
         return Auth::user()->hasRole('superadmin')
             ? $query
@@ -97,22 +97,20 @@ class PaymentResource extends Resource
 
                 Forms\Components\Hidden::make('foundation_id')
                     ->default(fn() => Auth::user()->foundation_id)
-                    ->visible(fn() => !Auth::user()->hasRole('superadmin')),
+                    ->visible(fn() => !Auth::user()->hasRole('superadmin'))
+                    ->dehydrated(),
 
                 // Academic Year Selection
-
                 Forms\Components\Hidden::make('student_academic_year_id')
-                    ->default(function (Get $get) {
-                        return StudentAcademic::where('student_id', $get('student_id'))
-                            ->where('academic_year_id', $get('academic_year_id'))
-                            ->value('id');
-                    })
-                    ->required()
                     ->dehydrated(),
 
                 Forms\Components\Select::make('academic_year_id')
-                    ->label('Tahun Ajaran')
-                    ->relationship('academicYear', 'name')
+                    // ->label('Tahun Ajaran')
+                    // ->relationship('academicYear', 'name')
+                     ->options(
+                            AcademicYear::where('foundation_id', auth()->user()->foundation_id)
+                            ->pluck('name', 'id')
+                        )
                     ->required()
                     ->live()
                     ->afterStateUpdated(fn(Forms\Set $set) => $set('student_id', null)),
@@ -124,8 +122,19 @@ class PaymentResource extends Resource
                     ->searchable()
                     ->afterStateUpdated(function (Forms\Set $set, Get $get) {
                         self::calculateDiscount($set, $get);
+                        $academicYearId = $get('academic_year_id');
+                        $studentId = $get('student_id');
+
+                        if ($academicYearId && $studentId) {
+                            $studentAcademicYearId = \App\Models\StudentAcademic::where('academic_year_id', $academicYearId)
+                                ->where('student_id', $studentId)
+                                ->value('id');
+
+                            $set('student_academic_year_id', $studentAcademicYearId);
+                        }
+                    
                     })
-                    ->preload() // Load some options immediately
+                    ->preload()
                     ->options(function (Get $get) {
                         if (!$get('academic_year_id')) return [];
 
@@ -188,16 +197,21 @@ class PaymentResource extends Resource
                         $set('paid_amount', $originalAmount);
 
                         self::calculateDiscount($set, $get);
+
+                         $academicYearId = $get('academic_year_id');
+                        $feeTypeId = $get('fee_type_id');
+
+                        if ($academicYearId && $feeTypeId) {
+                            $feeId = \App\Models\Fee::where('academic_year_id', $academicYearId)
+                                ->where('fee_type_id', $feeTypeId)
+                                ->value('id');
+
+                            $set('fee_id', $feeId);
+                        }
                     }),
 
 
                 Forms\Components\Hidden::make('fee_id')
-                    ->default(function (Get $get) {
-                        return Fee::where('fee_type_id', $get('fee_type_id'))
-                            ->where('academic_year_id', $get('academic_year_id'))
-                            ->value('id');
-                    })
-                    ->required()
                     ->dehydrated(),
 
                 Forms\Components\Select::make('month')
@@ -215,7 +229,8 @@ class PaymentResource extends Resource
                         'Oktober' => 'Oktober',
                         'November' => 'November',
                         'Desember' => 'Desember',
-                    ]),
+                    ])
+                    ->required(),
 
                 Forms\Components\DatePicker::make('payment_date')
                     ->label('Tanggal Pembayaran')
@@ -244,7 +259,8 @@ class PaymentResource extends Resource
                     ->numeric()
                     ->readOnly()
                     ->reactive()
-                    ->default(0),
+                    ->default(0)
+                    ->dehydrated(),
 
                 Forms\Components\Select::make('payment_method')
                     ->label('Metode Pembayaran')
@@ -328,57 +344,17 @@ class PaymentResource extends Resource
 
                 Tables\Columns\TextColumn::make('payment_method')
                     ->label('Metode'),
-
-                Tables\Columns\IconColumn::make('receipt_pdf')
-                    ->label('Bukti')
-                    ->icon(fn($state) => $state ? 'heroicon-o-document' : 'heroicon-o-x-circle')
-                    ->color(fn($state) => $state ? 'success' : 'danger'),
             ])
             ->filters([
-
-                Tables\Filters\SelectFilter::make('fee.fee_type_id')
-                    ->label('Jenis Pembayaran')
-                    ->searchable()
-                    ->relationship('fee.feeType', 'name'),
-
-                Tables\Filters\SelectFilter::make('month')
-                    ->options([
-                        'Januari' => 'Januari',
-                        'Februari' => 'Februari',
-                        'Maret' => 'Maret',
-                        'April' => 'April',
-                        'Mei' => 'Mei',
-                        'Juni' => 'Juni',
-                        'Juli' => 'Juli',
-                        'Agustus' => 'Agustus',
-                        'September' => 'September',
-                        'Oktober' => 'Oktober',
-                        'November' => 'November',
-                        'Desember' => 'Desember',
-                    ]),
-
-                Tables\Filters\SelectFilter::make('payment_method')
-                    ->options([
-                        'Tunai' => 'Tunai',
-                        'Transfer' => 'Transfer',
-                    ]),
-
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Html2MediaAction::make('print')
+               Tables\Actions\Action::make('print')
                     ->label('Cetak Struk')
                     ->icon('heroicon-o-printer')
-                    ->scale(2)
-                    ->print()
-                    ->preview()
-                    ->filename('struk_pembayaran')
-                    ->savePdf()
-                    ->orientation('portrait')
-                    ->format('a4', 'mm')
-                    ->margin([10, 15, 10, 15])
-                    ->content(fn($record) => view('payments.receipt', ['record' => $record]))
+                    ->url(fn($record) => route('payments.print', $record))
+                    ->openUrlInNewTab(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -399,7 +375,15 @@ class PaymentResource extends Resource
 
     public static function beforeCreate(array $data): array
     {
-        // Pastikan fee_id terisi
+        \Log::info('BeforeCreate Data:', $data);
+
+        if (empty($data['student_academic_year_id'])) {
+    $data['student_academic_year_id'] = StudentAcademic::where('student_id', $data['student_id'] ?? null)
+        ->where('academic_year_id', $data['academic_year_id'] ?? null)
+        ->value('id');
+}
+
+     
         if (empty($data['fee_id'])) {
             $data['fee_id'] = Fee::where('fee_type_id', $data['fee_type_id'])
                 ->where('academic_year_id', $data['academic_year_id'])

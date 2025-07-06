@@ -57,13 +57,17 @@ class FeeTypeResource extends Resource
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
                             ->required(),
-                        // ... field lainnya
                     ]),
 
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Tipe Pembayaran')
-                    ->required()
-                    ->maxLength(255),
+                    ->datalist([
+                        'SPP',
+                        'Uang Gedung',
+                        'Seragam',
+                        'Kegiatan',
+                    ])
+                    ->required(),
 
                 Forms\Components\Select::make('frequency')
                     ->label('Frekuensi')
@@ -80,16 +84,6 @@ class FeeTypeResource extends Resource
                     ->relationship()
                     ->label('Detail Biaya')
                     ->schema([
-                        Forms\Components\Select::make('academic_year_id')
-                            ->label('Tahun Ajaran')
-                            ->relationship(
-                                name: 'academicYear',
-                                titleAttribute: 'name'
-                            )
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->exists('academic_years', 'id'),
 
                         Forms\Components\TextInput::make('amount')
                             ->label('Jumlah')

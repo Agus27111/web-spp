@@ -114,6 +114,9 @@ class DiscountResource extends Resource
                                     )
                                     ->searchable()
                                     ->required(),
+
+                                Forms\Components\Hidden::make('is_active')
+                                    ->default(true),
                             ])
 
 

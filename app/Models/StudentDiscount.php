@@ -27,8 +27,14 @@ class StudentDiscount extends Model
         return $this->belongsTo(FeeType::class);
     }
 
-    public function discount()
-    {
-        return $this->belongsTo(Discount::class)->where('is_active', true);
-    }
+   public function discount()
+{
+    return $this->belongsTo(Discount::class);
+}
+
+public function activeDiscount()
+{
+    return $this->belongsTo(Discount::class)->where('is_active', true);
+}
+
 }

@@ -11,6 +11,12 @@ class CreatePayment extends CreateRecord
 {
     protected static string $resource = PaymentResource::class;
 
+       protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return PaymentResource::beforeCreate($data);
+    }
+
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
@@ -18,6 +24,8 @@ class CreatePayment extends CreateRecord
 
     protected function afterCreate(): void
     {
+
+         \Log::info('AfterCreate record:', $this->record->toArray());
         // Pastikan metode setCalculatedFields() tersedia sebelum dipanggil
         if (method_exists($this->record, 'setCalculatedFields')) {
             $this->record->setCalculatedFields();
@@ -35,6 +43,8 @@ class CreatePayment extends CreateRecord
             );
         }
     }
+
+ 
 
 
     protected function getCreatedNotificationTitle(): ?string
